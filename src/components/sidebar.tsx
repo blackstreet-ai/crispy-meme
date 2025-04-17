@@ -66,7 +66,7 @@ export function Sidebar() {
   ]
 
   return (
-    <aside className={`flex flex-col h-screen border-r border-border/40 bg-background ${collapsed ? 'w-16' : 'w-64'} transition-all duration-300`}>
+    <aside className={`flex flex-col h-screen sticky top-0 border-r border-border/40 bg-background ${collapsed ? 'w-16' : 'w-64'} transition-all duration-300`}>
       <div className="p-4 flex items-center justify-between">
         {!collapsed && (
           <Link href="/" className="flex items-center">
