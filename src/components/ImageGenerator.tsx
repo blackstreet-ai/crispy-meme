@@ -47,39 +47,46 @@ export function ImageGenerator() {
   };
 
   return (
-    <div className="flex flex-col space-y-4 w-full max-w-md mx-auto">
-      <div className="space-y-2">
-        <Input
-          type="text"
-          placeholder="Enter a prompt for image generation..."
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          disabled={isLoading}
-          className="w-full"
-        />
-        <Button 
-          onClick={generateImage} 
-          disabled={isLoading || !prompt.trim()}
-          className="w-full"
-        >
-          {isLoading ? 'Generating...' : 'Generate Image'}
-        </Button>
+    <div className="flex flex-col space-y-6 w-full">
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Input
+            type="text"
+            placeholder="Enter a prompt for image generation..."
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            disabled={isLoading}
+            className="w-full"
+          />
+          <Button 
+            onClick={generateImage} 
+            disabled={isLoading || !prompt.trim()}
+            className="w-full"
+            variant="default"
+          >
+            {isLoading ? 'Generating...' : 'Generate Image'}
+          </Button>
+        </div>
+        
+        {error && (
+          <div className="p-3 bg-destructive/10 text-destructive rounded-md text-sm">{error}</div>
+        )}
       </div>
       
-      {error && (
-        <div className="text-red-500 text-sm">{error}</div>
-      )}
-      
-      {imageUrl && (
-        <div className="mt-4 relative w-full aspect-square">
+      {imageUrl ? (
+        <div className="relative w-full aspect-square rounded-md overflow-hidden border border-border">
           <Image 
             src={imageUrl} 
             alt="Generated image" 
-            className="rounded-md shadow-md object-contain" 
+            className="object-contain" 
             fill
-            sizes="(max-width: 768px) 100vw, 50vw"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             priority
           />
+        </div>
+      ) : (
+        <div className="relative w-full aspect-square rounded-md border border-dashed border-border flex items-center justify-center bg-muted/40">
+          <p className="text-muted-foreground text-sm">Generated image will appear here</p>
         </div>
       )}
     </div>

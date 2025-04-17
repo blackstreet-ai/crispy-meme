@@ -2,7 +2,18 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ['v3.fal.media'], // Allow images from Fal.ai media domain
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'v3.fal.media',
+        pathname: '**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'ui.shadcn.com',
+        pathname: '**',
+      },
+    ],
   },
 };
 
