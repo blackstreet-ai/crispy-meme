@@ -1,7 +1,6 @@
 "use client"
 
-import Link from "next/link"
-import { Search, Bell, User, PanelRight } from "lucide-react"
+import { Bell, User, PanelRight } from "lucide-react"
 import { useSidebar } from "./sidebar-context"
 import { ThemeToggle } from "./ui/theme-toggle"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
@@ -15,27 +14,6 @@ export function Header() {
         <button onClick={toggle} className="p-1.5 rounded-md hover:bg-accent">
           <PanelRight className={`h-5 w-5 transition-transform ${collapsed ? 'rotate-180' : ''}`} />
         </button>
-        <div className="relative flex-1 max-w-md mx-4">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <input
-              type="search"
-              placeholder="Search"
-              className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 pl-9 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-            />
-            <div className="absolute right-2.5 top-2.5">
-              <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
-                <span className="text-xs">⌘</span>K
-              </kbd>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Link href="/browse" className="text-sm font-medium flex items-center gap-1">
-            Browse
-          </Link>
-        </div>
 
         <div className="ml-auto flex items-center gap-4">
           <button className="relative">
