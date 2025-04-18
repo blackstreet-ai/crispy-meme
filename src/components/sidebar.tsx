@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
+import { useSidebar } from "./sidebar-context"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { 
   LayoutDashboard, 
@@ -10,8 +10,7 @@ import {
   CreditCard, 
   BarChart2, 
   Users, 
-  Settings,
-  ChevronLeft
+  Settings
 } from "lucide-react"
 
 interface SidebarItem {
@@ -21,7 +20,7 @@ interface SidebarItem {
 }
 
 export function Sidebar() {
-  const [collapsed, setCollapsed] = useState(false)
+  const { collapsed } = useSidebar()
 
   const mainItems: SidebarItem[] = [
     {
@@ -66,26 +65,18 @@ export function Sidebar() {
   ]
 
   return (
-    <aside className={`flex flex-col h-screen border-r border-border/40 bg-background ${collapsed ? 'w-16' : 'w-64'} transition-all duration-300`}>
-      <div className="p-4 flex items-center justify-between">
-        {!collapsed && (
-          <Link href="/" className="flex items-center">
-            <div className="w-8 h-8 mr-2">
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-purple-500">
-                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M7.5 12C7.5 12 9 9 12 9C15 9 16.5 12 16.5 12C16.5 12 15 15 12 15C9 15 7.5 12 7.5 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M12 12.5C12.2761 12.5 12.5 12.2761 12.5 12C12.5 11.7239 12.2761 11.5 12 11.5C11.7239 11.5 11.5 11.7239 11.5 12C11.5 12.2761 11.7239 12.5 12 12.5Z" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </div>
-            <span className="font-medium text-xl">Frox</span>
-          </Link>
-        )}
-        <button 
-          onClick={() => setCollapsed(!collapsed)}
-          className="p-1.5 rounded-md hover:bg-accent"
-        >
-          <ChevronLeft className={`h-5 w-5 transition-transform ${collapsed ? 'rotate-180' : ''}`} />
-        </button>
+    <aside className={`flex flex-col h-screen sticky top-0 border-r border-border/40 bg-background ${collapsed ? 'w-16' : 'w-64'} transition-all duration-300`}>
+      <div className="p-4 flex items-center justify-center">
+        <Link href="/" className="flex items-center">
+          <div className={`w-8 h-8 ${!collapsed ? 'mr-2' : ''}`}>
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-purple-500">
+              <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M7.5 12C7.5 12 9 9 12 9C15 9 16.5 12 16.5 12C16.5 12 15 15 12 15C9 15 7.5 12 7.5 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M12 12.5C12.2761 12.5 12.5 12.2761 12.5 12C12.5 11.7239 12.2761 11.5 12 11.5C11.7239 11.5 11.5 11.7239 11.5 12C11.5 12.2761 11.7239 12.5 12 12.5Z" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          {!collapsed && <span className="font-medium text-xl">Frox</span>}
+        </Link>
       </div>
 
       <nav className="flex-1 overflow-y-auto py-4">
