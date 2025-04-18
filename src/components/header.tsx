@@ -1,15 +1,20 @@
 "use client"
 
 import Link from "next/link"
-import { Search, Bell, User } from "lucide-react"
+import { Search, Bell, User, PanelRight } from "lucide-react"
+import { useSidebar } from "./sidebar-context"
 import { ThemeToggle } from "./ui/theme-toggle"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 
 export function Header() {
+  const { collapsed, toggle } = useSidebar()
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-14 items-center px-4">
-        
+        {/* Sidebar toggle */}
+        <button onClick={toggle} className="p-1.5 rounded-md hover:bg-accent">
+          <PanelRight className={`h-5 w-5 transition-transform ${collapsed ? 'rotate-180' : ''}`} />
+        </button>
         <div className="relative flex-1 max-w-md mx-4">
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
