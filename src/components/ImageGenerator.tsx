@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { fal } from '@/lib/fal';
 import { Button } from '@/components/ui/button';
@@ -11,13 +11,38 @@ import { Switch } from '@/components/ui/switch';
 
 const MODEL_OPTIONS = [
   { value: 'fal-ai/flux/dev', label: 'Flux (Dev)' },
+  { value: 'fal-ai/flux/schnell', label: 'Flux (Schnell)' },
   // Add more models as needed
 ];
-const IMAGE_SIZE_OPTIONS = [
-  { value: 'square_hd', label: 'Square HD' },
-  { value: 'portrait_hd', label: 'Portrait HD' },
-  { value: 'landscape_hd', label: 'Landscape HD' },
-];
+
+// Dynamic model specification mapping
+type Parameter = { name: string; type: string; description: string; default?: string | number | boolean; enumValues?: string[]; };
+type ModelSpec = { parameters: Parameter[]; };
+const MODEL_SPECS: Record<string, ModelSpec> = {
+  'fal-ai/flux/dev': {
+    parameters: [
+      { name: 'prompt', type: 'string', description: 'The prompt to generate an image from.' },
+      { name: 'image_size', type: 'enum', description: 'The size of the generated image.', default: 'landscape_4_3', enumValues: ['square_hd','square','portrait_4_3','portrait_16_9','landscape_4_3','landscape_16_9'] },
+      { name: 'num_inference_steps', type: 'integer', description: 'The number of inference steps to perform.', default: 28 },
+      { name: 'seed', type: 'integer', description: 'The seed for image generation. Same seed and prompt yields the same image.' },
+      { name: 'guidance_scale', type: 'float', description: 'CFG (Classifier Free Guidance) scale.', default: 3.5 },
+      { name: 'sync_mode', type: 'boolean', description: 'Wait for image to be generated and uploaded before returning.' },
+      { name: 'num_images', type: 'integer', description: 'The number of images to generate.', default: 1 },
+      { name: 'enable_safety_checker', type: 'boolean', description: 'Enable the safety checker.', default: true },
+    ],
+  },
+  'fal-ai/flux/schnell': {
+    parameters: [
+      { name: 'prompt', type: 'string', description: 'The prompt to generate an image from.' },
+      { name: 'image_size', type: 'enum', description: 'The size of the generated image.', default: 'landscape_4_3', enumValues: ['square_hd','square','portrait_4_3','portrait_16_9','landscape_4_3','landscape_16_9'] },
+      { name: 'num_inference_steps', type: 'integer', description: 'The number of inference steps to perform.', default: 4 },
+      { name: 'seed', type: 'integer', description: 'The same seed and the same prompt given to the same version of the model will output the same image every time.' },
+      { name: 'sync_mode', type: 'boolean', description: 'If set to true, waits for image generation and upload before returning.' },
+      { name: 'num_images', type: 'integer', description: 'The number of images to generate.', default: 1 },
+      { name: 'enable_safety_checker', type: 'boolean', description: 'If set to true, the safety checker will be enabled.', default: true },
+    ],
+  },
+};
 
 export function ImageGenerator() {
   // Prompt & result
@@ -36,6 +61,29 @@ export function ImageGenerator() {
   const [safetyChecker, setSafetyChecker] = useState(true);
   const [streaming, setStreaming] = useState(true);
   const [seed, setSeed] = useState('');
+
+  // Dynamic spec state for selected model
+  const [spec, setSpec] = useState<ModelSpec | null>(MODEL_SPECS[model] || null);
+  // Derive imageSize options from spec
+  const imageSizeOptions = spec?.parameters.find(p => p.name === 'image_size')?.enumValues?.map(v => ({ value: v, label: v.split('_').map(w => w.charAt(0).toUpperCase()+w.slice(1)).join(' ') })) ?? [];
+
+  useEffect(() => {
+    const mSpec = MODEL_SPECS[model];
+    setSpec(mSpec);
+    if (mSpec) {
+      mSpec.parameters.forEach(p => {
+        if (p.default != null) {
+          switch (p.name) {
+            case 'num_inference_steps': setSteps(p.default as number); break;
+            case 'guidance_scale': setCfg(p.default as number); break;
+            case 'num_images': setNumImages(p.default as number); break;
+            case 'image_size': setImageSize(p.default as string); break;
+            case 'enable_safety_checker': setSafetyChecker(p.default as boolean); break;
+          }
+        }
+      });
+    }
+  }, [model]);
 
   // Helpers
   const handleRandomSeed = () => {
@@ -77,7 +125,6 @@ export function ImageGenerator() {
       setIsLoading(false);
     }
   };
-
 
   return (
     <div className="w-full flex flex-col md:flex-row gap-8">
@@ -126,9 +173,10 @@ export function ImageGenerator() {
         />
         <Select
           label="Image Size"
-          options={IMAGE_SIZE_OPTIONS}
+          options={imageSizeOptions}
           value={imageSize}
           onChange={setImageSize}
+          disabled={!imageSizeOptions.length}
         />
         <Slider
           label="Inference Steps"
@@ -183,6 +231,16 @@ export function ImageGenerator() {
               Random
             </Button>
           </div>
+        </div>
+        {/* Display API parameters for the selected model */}
+        <div className="bg-card border border-border rounded-md p-4 text-sm">
+          <h3 className="font-semibold mb-2">API Parameters</h3>
+          {spec?.parameters.map(param => (
+            <div key={param.name} className="mb-1">
+              <span className="font-medium">{param.name}</span> (<span className="italic">{param.type}</span>){param.default != null && <span>: default {String(param.default)}</span>}
+              <div className="text-muted-foreground">{param.description}</div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
