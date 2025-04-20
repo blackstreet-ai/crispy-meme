@@ -15,7 +15,7 @@ import { MODEL_OPTIONS, MODEL_SPECS } from '@/config/models';
 type FormData = Record<string, string | number | boolean>;
 
 export function ImageGenerator() {
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [model, setModel] = useState(MODEL_OPTIONS[0].value);
@@ -47,28 +47,41 @@ export function ImageGenerator() {
     reset(defaults);
   }, [spec, reset]);
   const onSubmit = async (data: FormData) => {
-    setIsLoading(true); setError(null); setImageUrl(null);
+    setIsLoading(true); setError(null); setImageUrls([]);
     try {
       const input = { ...data, streaming };
       const result = await fal.subscribe(model, { input, pollInterval: 2000, logs: true });
-      setImageUrl(result.data?.images?.[0]?.url ?? null);
-      if (!result.data?.images?.[0]?.url) throw new Error();
-    } catch { setError('Failed to generate image. Try again.'); }
-    finally { setIsLoading(false); }
+      const urls = result.data?.images
+        ?.map((img: { url?: string }) => img.url)
+        .filter((url: string | undefined): url is string => Boolean(url)) ?? [];
+      setImageUrls(urls);
+      if (urls.length === 0) throw new Error();
+    } catch {
+      setError('Failed to generate image. Try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="w-full flex flex-col md:flex-row gap-8">
       {/* Left: Image & Prompt */}
       <div className="flex-1 flex flex-col gap-6">
-        <div className="relative w-full aspect-square rounded-md overflow-hidden border border-border bg-muted/40 flex items-center justify-center">
-          {isLoading && <div className="absolute inset-0 bg-muted animate-pulse" />}
-          {imageUrl ? (
-            <Image src={imageUrl} alt="Generated image" fill className="object-contain" priority />
-          ) : (
+        {isLoading ? (
+          <div className="h-[300px] bg-muted animate-pulse rounded-md" />
+        ) : imageUrls.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {imageUrls.map((url, idx) => (
+              <div key={idx} className="relative w-full aspect-square rounded-md overflow-hidden border border-border bg-muted/40">
+                <Image src={url} alt={`Generated ${idx + 1}`} fill className="object-contain" priority />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="relative w-full aspect-square rounded-md overflow-hidden border border-border bg-muted/40 flex items-center justify-center">
             <span className="text-muted-foreground text-sm">Generated image will appear here</span>
-          )}
-        </div>
+          </div>
+        )}
         <div className="flex flex-row gap-2 items-end w-full">
           <Controller
             name="prompt"
