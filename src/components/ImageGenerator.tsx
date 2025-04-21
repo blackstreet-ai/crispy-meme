@@ -10,6 +10,8 @@ import { Select } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { MODEL_OPTIONS, MODEL_SPECS } from '@/config/models';
+import { Info } from 'lucide-react';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 
 // form data type
 type FormData = Record<string, string | number | boolean>;
@@ -110,22 +112,47 @@ export function ImageGenerator() {
       {/* Right: Parameter Controls */}
       <fieldset disabled={isLoading} className="w-full md:w-80">
         <div className="flex flex-col gap-4 bg-card border border-border rounded-xl p-6">
-          <Select label="Model" options={MODEL_OPTIONS} value={model} onChange={setModel} />
+          <div className="w-full flex flex-col gap-2">
+            <div className="flex items-center gap-1 mb-1">
+              <label className="text-xs font-medium text-muted-foreground">Model</label>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-4 w-4 text-muted-foreground hover:text-foreground cursor-pointer" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <span>Select AI model to use for image generation.</span>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            <Select options={MODEL_OPTIONS} value={model} onChange={setModel} />
+          </div>
           {/* Auto-generate controls based on spec */}
           {spec.parameters.filter(p => p.name !== 'prompt').map(param => {
             const label = param.name.split('_').map(w => w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
-            return <div key={param.name} className="w-full">{
+            return <div key={param.name} className="w-full flex flex-col gap-2">{
               param.type === 'enum' ? (
                 <Controller
                   name={param.name}
                   control={control}
                   render={({ field }) => (
-                    <Select
-                      label={label}
-                      options={param.enumValues!.map(v => ({ value: v, label: v }))}
-                      value={field.value as string}
-                      onChange={field.onChange}
-                    />
+                    <>
+                      <div className="flex items-center gap-1 mb-1">
+                        <label className="text-xs font-medium text-muted-foreground">{label}</label>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Info className="h-4 w-4 text-muted-foreground hover:text-foreground cursor-pointer" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <span>{param.description}</span>
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                      <Select
+                        options={param.enumValues!.map(v => ({ value: v, label: v }))}
+                        value={field.value as string}
+                        onChange={field.onChange}
+                      />
+                    </>
                   )}
                 />
               ) : param.type === 'integer' || param.type === 'float' ? (
@@ -134,14 +161,26 @@ export function ImageGenerator() {
                     name={param.name}
                     control={control}
                     render={({ field }) => (
-                      <Slider
-                        label={label}
-                        min={param.min!}
-                        max={param.max!}
-                        step={param.step!}
-                        value={field.value as number}
-                        onChange={field.onChange}
-                      />
+                      <>
+                        <div className="flex items-center gap-1 mb-1">
+                          <label className="text-xs font-medium text-muted-foreground">{label}</label>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info className="h-4 w-4 text-muted-foreground hover:text-foreground cursor-pointer" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <span>{param.description}</span>
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
+                        <Slider
+                          min={param.min!}
+                          max={param.max!}
+                          step={param.step!}
+                          value={field.value as number}
+                          onChange={field.onChange}
+                        />
+                      </>
                     )}
                   />
                 ) : (
@@ -151,17 +190,29 @@ export function ImageGenerator() {
                     render={({ field }) => {
                       const { value, onChange, onBlur, name, ref } = field;
                       return (
-                        <Input
-                          value={value as number}
-                          onChange={e => onChange(Number(e.target.value))}
-                          onBlur={onBlur}
-                          name={name}
-                          ref={ref}
-                          type="number"
-                          placeholder={label}
-                          disabled={isLoading}
-                          className="w-full"
-                        />
+                        <>
+                          <div className="flex items-center gap-1 mb-1">
+                            <label className="text-xs font-medium text-muted-foreground">{label}</label>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Info className="h-4 w-4 text-muted-foreground hover:text-foreground cursor-pointer" />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <span>{param.description}</span>
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
+                          <Input
+                            value={value as number}
+                            onChange={e => onChange(Number(e.target.value))}
+                            onBlur={onBlur}
+                            name={name}
+                            ref={ref}
+                            type="number"
+                            disabled={isLoading}
+                            className="w-full"
+                          />
+                        </>
                       );
                     }}
                   />
@@ -171,27 +222,50 @@ export function ImageGenerator() {
                   name={param.name}
                   control={control}
                   render={({ field }) => (
-                    <Switch
-                      label={label}
-                      checked={field.value as boolean}
-                      onCheckedChange={field.onChange}
-                    />
+                    <>
+                      <div className="flex items-center gap-1 mb-1">
+                        <label className="text-xs font-medium text-muted-foreground">{label}</label>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Info className="h-4 w-4 text-muted-foreground hover:text-foreground cursor-pointer" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <span>{param.description}</span>
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                      <Switch
+                        checked={field.value as boolean}
+                        onCheckedChange={field.onChange}
+                      />
+                    </>
                   )}
                 />
               ) : null
             }</div>;
           })}
-          {/* Streaming separate control */}
-          <div><Switch label="Streaming" checked={streaming} onCheckedChange={setStreaming} /></div>
-          {/* Display API parameters */}
-          <div className="bg-card border border-border rounded-md p-4 text-sm">
-            <h3 className="font-semibold mb-2">API Parameters</h3>
-            {spec.parameters.map(p => (
-              <div key={p.name} className="mb-1">
-                <span className="font-medium">{p.name}</span> (<span className="italic">{p.type}</span>){p.default!=null && <span>: default {String(p.default)}</span>}
-                <div className="text-muted-foreground">{p.description}</div>
-              </div>
-            ))}
+          {/* Streaming toggle */}
+          <div className="mb-4">
+            <Switch label="Streaming" checked={streaming} onCheckedChange={setStreaming} />
+          </div>
+          <div className="flex justify-end mt-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Info className="h-5 w-5 text-muted-foreground hover:text-foreground cursor-pointer" />
+              </TooltipTrigger>
+              <TooltipContent side="top" align="end">
+                <div className="space-y-2 max-w-xs">
+                  {spec.parameters.map(p => (
+                    <div key={p.name} className="pb-1 border-b last:border-b-0 border-border">
+                      <div className="font-medium">
+                        {p.name} <span className="italic">({p.type})</span>{p.default != null && `: default ${String(p.default)}`}
+                      </div>
+                      <div className="text-muted-foreground text-sm">{p.description}</div>
+                    </div>
+                  ))}
+                </div>
+              </TooltipContent>
+            </Tooltip>
           </div>
         </div>
       </fieldset>

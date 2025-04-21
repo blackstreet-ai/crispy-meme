@@ -6,6 +6,7 @@ import { Header } from "@/components/header";
 import { Sidebar } from "@/components/sidebar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SidebarProvider } from "@/components/sidebar-context";
+import { Provider as TooltipProvider } from '@radix-ui/react-tooltip';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,17 +39,19 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <SidebarProvider>
-            <div className="flex min-h-screen">
-              <Sidebar />
-              <div className="flex flex-col flex-1">
-                <Header />
-                <main className="flex-1 p-6 bg-background overflow-auto">
-                  {children}
-                </main>
+          <TooltipProvider>
+            <SidebarProvider>
+              <div className="flex min-h-screen">
+                <Sidebar />
+                <div className="flex flex-col flex-1">
+                  <Header />
+                  <main className="flex-1 p-6 bg-background overflow-auto">
+                    {children}
+                  </main>
+                </div>
               </div>
-            </div>
-          </SidebarProvider>
+            </SidebarProvider>
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>
